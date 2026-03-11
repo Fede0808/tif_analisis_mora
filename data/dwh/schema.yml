@@ -1,0 +1,53 @@
+models:
+  - name: fact_deuda_mensual
+    description: "Tabla principal de hechos conteniendo la deuda anonimizada y reportada mensualmente por las entidades."
+    columns:
+      - name: hash_deudor
+        type: VARCHAR
+        description: "MD5 del código de entidad concatenado con el CUIT/CUIL del deudor. Identificador único anonimizado."
+      - name: periodo_yyyymm
+        type: INTEGER
+        description: "Período de declaración (ej. 202512 para Diciembre 2025)."
+      - name: id_entidad
+        type: VARCHAR
+        description: "Código de 5 dígitos de la entidad acreedora."
+      - name: id_situacion
+        type: INTEGER
+        description: "Situación crediticia (1=Normal a 6=Irrecuperable técnico)."
+        tests:
+          - accepted_values: [1, 2, 3, 4, 5, 6]
+      - name: monto_deuda
+        type: DECIMAL(18,3)
+        description: "Deuda en miles de pesos."
+        tests:
+          - assert_positive
+      - name: dias_atraso
+        type: INTEGER
+        description: "Días de mora reportados."
+        tests:
+          - assert_positive
+      - name: tipo_persona
+        type: VARCHAR
+        description: "Regla de negocio derivada de prefijo de CUIT: 'Física', 'Jurídica', o 'Otra/Desconocida'."
+        tests:
+          - accepted_values: ['Física', 'Jurídica', 'Otra/Desconocida']
+
+  - name: dim_entidad
+    description: "Catálogo de entidades bancarias y financieras."
+    columns:
+      - name: id_entidad
+        type: VARCHAR
+        description: "Código BCRA unívoco."
+      - name: nombre_entidad
+        type: VARCHAR
+
+  - name: dim_situacion
+    description: "Catálogo de situaciones de mora del BCRA."
+    columns:
+      - name: id_situacion
+        type: INTEGER
+      - name: descripcion
+        type: VARCHAR
+      - name: is_default
+        type: BOOLEAN
+        description: "Situaciones 3 a 6 se consideran Default."

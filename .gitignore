@@ -1,0 +1,23 @@
+# Ignorar entornos virtuales y cachés
+.venv/
+__pycache__/
+.pytest_cache/
+.streamlit/secrets.toml
+
+# Ignorar TODOS los datos crudos y de referencia pesados
+data/descarga_manual/
+data/referencia/localidades_georef.csv
+
+# Ignorar TODOS los Data Warehouses (contienen PII/CUITs)
+data/dwh/*.duckdb
+data/dwh/*.duckdb.wal
+data/dwh/parquet/
+
+# EXCEPCIÓN: Permitir únicamente el Data Mart agregado y anónimo para la web
+!data/dwh/datamart_bancos.parquet
+
+# Archivos temporales de agentes/SO
+.DS_Store
+*.tmp
+*.bak
+c:/tmp/

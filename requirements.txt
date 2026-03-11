@@ -1,0 +1,9 @@
+# Requerimientos base extraidos del codigo fuente
+numpy
+pandas
+scikit-learn
+duckdb
+streamlit
+selenium
+torch
+plotly
