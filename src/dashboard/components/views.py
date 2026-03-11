@@ -18,7 +18,8 @@ from pathlib import Path
 @st.cache_data(show_spinner="Cargando Data Mart optimizado...")
 def load_datamart_data():
     """Lee el Parquet agregado del Data Mart para la web."""
-    base_dir = Path(__file__).parent.parent.parent.parent
+    # En Streamlit Cloud el CWD es el root del repositorio.
+    base_dir = Path.cwd()
     datamart_path = base_dir / "data" / "dwh" / "datamart_bancos.parquet"
 
     if not datamart_path.exists():
@@ -289,7 +290,8 @@ def render_vista_temporal(df: pd.DataFrame):
     # ── Carga datamart_fechas_origen para vista de antigüedad ─────────────────
     st.subheader("📆 Antigüedad en Situación Normal (Padrón 1DSF)")
 
-    base_dir = Path(__file__).parent.parent.parent.parent
+    # En Streamlit Cloud el CWD es el root del repositorio.
+    base_dir = Path.cwd()
     datamart_fechas_path = base_dir / "data" / "dwh" / "datamart_fechas_origen.parquet"
 
     if datamart_fechas_path.exists():
