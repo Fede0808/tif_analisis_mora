@@ -64,34 +64,116 @@ Durante la sesión se detectó una incidencia técnica local vinculada a Git y V
 
 La resolución de esta incidencia consumió tiempo adicional no previsto, pero fue necesaria para asegurar que el repositorio quedara en condiciones mínimas de control antes de abrir la auditoría.
 
-## Sesión 002 — Inicio de auditoría estratégica
+## Sesión 002 — Auditoría estratégica del repositorio y estructura de datos
 
-**Fecha:** 2026-05-01; 13:39:00 14_19 pare a comer 15:28
+**Fecha:** 2026-05-01
 **Chat:** 01 — Auditoría estratégica del repositorio y estructura de datos
-**Tipo de sesión:** auditoría / diagnóstico
-**Duración estimada:** pendiente
-**Duración real:** pendiente
+**Tipo de sesión:** auditoría técnica / metodológica / privacidad
+**Duración estimada:** [2:30]
+**Duración real:** [completar]
 
 ### Objetivo
 
-Iniciar la auditoría estratégica del repositorio y de la estructura de datos para determinar qué alcance metodológico es viable para el TIF.
+Retomar la auditoría estratégica del repositorio y de la estructura de datos del TIF para determinar si los datos permiten sostener la Ruta A — análisis temporal de mora — o si corresponde reformular hacia la Ruta B — segmentación no supervisada de perfiles crediticios.
 
-### Contexto de inicio
+### Contexto
 
-La auditoría deberá evaluar si el TIF puede sostener la Ruta A, orientada al análisis temporal de mora, o si conviene reformularlo hacia la Ruta B, orientada a segmentación no supervisada de perfiles crediticios.
+El TIF se enfoca en el análisis de patrones de mora y comportamiento crediticio en Argentina utilizando datos públicos sensibles. El aporte principal será metodológico y analítico. Las herramientas de IA se utilizan como soporte de desarrollo, trazabilidad, revisión y documentación, pero no constituyen el objeto central del TIF.
 
-### Insumos iniciales previstos
+### Actividades realizadas
 
-- Árbol de carpetas del repositorio.
-- README y archivos de configuración.
-- Notebooks y scripts principales.
-- Descripción segura de la estructura de datos.
-- Rango temporal, periodicidad y variables disponibles.
-- Identificación de riesgos técnicos, metodológicos y de privacidad.
+1. Se retomó el Chat 01 luego de una bifurcación operativa destinada a incorporar instrucciones y prompts para el uso controlado de asistentes de IA en el repositorio.
+2. Se confirmó que se agregó y publicó una capa mínima de gobierno de agentes:
+   - `.github/copilot-instructions.md`
+   - `.github/prompts/repo-audit.prompt.md`
+   - `.github/prompts/data-structure-audit.prompt.md`
+   - `.github/prompts/privacy-review.prompt.md`
+   - `.github/prompts/issue-writer.prompt.md`
+   - `.github/prompts/implementation-task.prompt.md`
+   - `.github/prompts/methodology-review.prompt.md`
+   - `docs/ai-workflow/uso_agentes_tif.md`
+   - `docs/ai-workflow/matriz_herramientas_ia.md`
+   - `AGENTS.md`
+3. Se registró el commit publicado:
+   - `d0068d1 chore: add agent instructions and AI workflow prompts`
+4. Se validó que:
+   - `main` local quedó sincronizada con `origin/main`;
+   - el working tree quedó limpio;
+   - no se modificaron datos;
+   - no se modificaron notebooks analíticos;
+   - no se agregaron dependencias;
+   - no se cambió el alcance metodológico del TIF.
+5. Se actualizó el contexto con documentación normativa de la Central de Deudores del BCRA.
+6. Se revisó la conveniencia de ejecutar la auditoría de estructura de datos usando Copilot Agent o Codex en VSCode con instrucciones específicas.
+7. Se recibió un primer informe de auditoría local generado por el agente.
+
+### Hallazgos principales
+
+1. La estructura técnica del repositorio ya contiene elementos compatibles con una auditoría temporal:
+   - `hash_id`;
+   - `periodo_yyyymm`;
+   - `fact_deuda_mensual`;
+   - `fact_historial_24`;
+   - `id_situacion`;
+   - `dias_atraso`;
+   - tablas dimensionales y parquets derivados.
+2. El informe del agente clasifica preliminarmente la Ruta A como “viable con restricciones”.
+3. La viabilidad de Ruta A todavía no está cerrada porque falta verificar empíricamente:
+   - cantidad real de períodos distintos;
+   - continuidad de `hash_id` entre períodos;
+   - cantidad de unidades con más de una observación temporal;
+   - duplicados por claves candidatas;
+   - posibilidad efectiva de construir transiciones;
+   - mapeo correcto de `mes_n` a `periodo_yyyymm` en `fact_historial_24`.
+4. La Ruta B sigue vigente como alternativa si no se confirma continuidad temporal suficiente.
+5. Persisten riesgos de privacidad que deben mantenerse bajo control:
+   - presencia de datos crudos locales;
+   - posible PII en parquets detallados;
+   - uso de `nro_identificacion` y `denominacion` en algunas capas internas;
+   - necesidad de validar datamarts publicables.
+
+### Decisiones tomadas
+
+1. No avanzar todavía a implementación.
+2. No construir backlog operativo hasta cerrar la evidencia mínima de viabilidad metodológica.
+3. Usar Copilot Agent o Codex solo como auditor operativo local, no como decisor metodológico.
+4. Mantener ChatGPT como tutor metodológico para interpretar los resultados y decidir Ruta A o Ruta B.
+5. Incorporar la documentación normativa de BCRA como marco de referencia, no como sustituto de la auditoría empírica de datos.
+
+### Decisión metodológica pendiente
+
+Determinar si el TIF sostiene:
+
+- **Ruta A — análisis temporal de mora**, si se confirma continuidad longitudinal suficiente; o
+- **Ruta B — segmentación no supervisada de perfiles crediticios**, si los datos no permiten reconstruir trayectorias defendibles.
 
 ### Próximo paso
 
-Trabajar en el Chat 01 hasta obtener un diagnóstico inicial del repositorio y de los datos.
+Ejecutar localmente, sin modificar archivos ni exponer datos sensibles, las consultas de verificación mínima sobre DuckDB o parquets:
+
+1. conteo de filas de `fact_deuda_mensual`;
+2. mínimo, máximo y cantidad de períodos distintos;
+3. cantidad de `hash_id` únicos;
+4. cantidad y porcentaje de `hash_id` con más de un período;
+5. duplicados por `hash_id + periodo_yyyymm`;
+6. duplicados por `hash_id + cod_entidad + periodo_yyyymm`;
+7. distribución agregada de `id_situacion` por período;
+8. estado de `fact_historial_24`;
+9. presencia de columnas sensibles en parquets;
+10. evaluación preliminar de posibilidad de construir transiciones.
+
+### Riesgos abiertos
+
+1. Definir Ruta A sin evidencia empírica suficiente.
+2. Subestimar la diferencia entre tener una variable temporal y tener verdadera longitudinalidad.
+3. Exponer datos públicos sensibles o PII en archivos derivados.
+4. Construir backlog antes de cerrar la decisión metodológica.
+5. Sobredimensionar el rol de agentes o herramientas de IA.
+
+### Estado al cierre de la sesión
+
+La auditoría estratégica queda en curso.
+La hipótesis vigente es: **Ruta A viable con restricciones**, pendiente de validación empírica mediante consultas agregadas sobre la estructura real de datos.
 
 ## Incidencias técnicas
 
